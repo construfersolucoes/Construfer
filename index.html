@@ -3,11 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <title>Construfer</title>
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    #container {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+    #controls {
+      width: 260px;
+      padding: 15px;
+      border-right: 1px solid #ddd;
+    }
+    #viewer {
+      flex: 1;
+      height: 100%;
+      background: #eee;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 5px;
+    }
+  </style>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
 </head>
+
 <body>
 
 <header>
@@ -15,37 +50,105 @@
 </header>
 
 <div id="container">
-
   <div id="controls">
     <h3>Medidas (mm)</h3>
 
     <label>Altura esquerda</label>
-    <input id="alturaEsq" type="number" value="100">
+    <input id="h1" type="number" value="100">
 
     <label>Fundo</label>
     <input id="fundo" type="number" value="150">
 
     <label>Altura direita</label>
-    <input id="alturaDir" type="number" value="80">
+    <input id="h2" type="number" value="80">
 
     <label>Comprimento</label>
-    <input id="comprimento" type="number" value="3000">
+    <input id="comp" type="number" value="3000">
 
     <label>Cor</label>
     <select id="cor">
-      <option value="galvanizada">Galvanizada</option>
+      <option value="galv">Galvanizada</option>
       <option value="branca">Branca</option>
     </select>
 
-    <button onclick="gerarCalha()">Gerar Calha</button>
+    <button onclick="gerar()">Gerar Calha</button>
   </div>
 
   <div id="viewer"></div>
-
 </div>
+
 <script>
-  alert("SCRIPT CARREGOU");
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+
+  const viewer = document.getElementById("viewer");
+
+  const camera = new THREE.PerspectiveCamera(45, viewer.clientWidth / viewer.clientHeight, 1, 10000);
+  camera.position.set(300, 200, 300);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  viewer.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  scene.add(new THREE.DirectionalLight(0xffffff, 1));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+  let mesh;
+
+  function gerar() {
+    if (mesh) scene.remove(mesh);
+
+    const h1 = Number(h1Input.value);
+    const h2 = Number(h2Input.value);
+    const fundo = Number(fundoInput.value);
+    const comp = Number(compInput.value);
+
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.lineTo(0, h1);
+    shape.lineTo(fundo, h2);
+    shape.lineTo(fundo, 0);
+
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth: comp / 20,
+      bevelEnabled: false
+    });
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: cor.value === "branca" ? 0xffffff : 0xaaaaaa
+    });
+
+    mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.position.x = -fundo / 2;
+
+    scene.add(mesh);
+  }
+
+  const h1Input = document.getElementById("h1");
+  const h2Input = document.getElementById("h2");
+  const fundoInput = document.getElementById("fundo");
+  const compInput = document.getElementById("comp");
+  const cor = document.getElementById("cor");
+
+  gerar();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  window.addEventListener("resize", () => {
+    camera.aspect = viewer.clientWidth / viewer.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  });
 </script>
-<script src="script.js"></script>
+
 </body>
 </html>
