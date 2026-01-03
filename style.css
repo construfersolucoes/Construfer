@@ -26,13 +26,16 @@ header {
   margin-top: 10px;
 }
 
-#controls input, select, button {
+#controls input, 
+#controls select, 
+#controls button {
   width: 100%;
   margin-top: 5px;
   padding: 5px;
 }
 
 #viewer {
-  flex: 1;
-  height: 100vh;
+  width: 100%;
+  height: 500px;   /* 🔥 ISSO É O SEGREDO */
+  background: #eee;
 }
