@@ -34,4 +34,5 @@ header {
 
 #viewer {
   flex: 1;
+  height: 100vh;
 }
