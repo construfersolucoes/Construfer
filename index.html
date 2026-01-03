@@ -1,34 +1,38 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>Construfer</title>
   <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>Construfer</h1>
+  <h2>Construfer</h2>
 </header>
 
 <div id="container">
+
   <div id="controls">
-    <h2>Medidas (mm)</h2>
+    <h3>Medidas (mm)</h3>
 
     <label>Altura esquerda</label>
-    <input type="number" id="h1" value="100">
+    <input id="alturaEsq" type="number" value="100">
 
     <label>Fundo</label>
-    <input type="number" id="base" value="150">
+    <input id="fundo" type="number" value="150">
 
     <label>Altura direita</label>
-    <input type="number" id="h2" value="80">
+    <input id="alturaDir" type="number" value="80">
 
     <label>Comprimento</label>
-    <input type="number" id="length" value="3000">
+    <input id="comprimento" type="number" value="3000">
 
     <label>Cor</label>
-    <select id="color">
+    <select id="cor">
       <option value="galvanizada">Galvanizada</option>
       <option value="branca">Branca</option>
     </select>
@@ -37,9 +41,9 @@
   </div>
 
   <div id="viewer"></div>
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>
