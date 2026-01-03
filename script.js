@@ -5,7 +5,7 @@ animate();
 
 function init() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf0f0f0);
+  scene.background = new THREE.Color(0xffffff);
 
   const viewer = document.getElementById("viewer");
 
@@ -15,22 +15,19 @@ function init() {
     1,
     10000
   );
-
-  camera.position.set(400, 300, 400);
+  camera.position.set(300, 200, 300);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(viewer.clientWidth, viewer.clientHeight);
   viewer.appendChild(renderer.domElement);
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
 
-  const light1 = new THREE.DirectionalLight(0xffffff, 1);
-  light1.position.set(500, 500, 500);
-  scene.add(light1);
+  const luz = new THREE.DirectionalLight(0xffffff, 1);
+  luz.position.set(500, 500, 500);
+  scene.add(luz);
 
-  const light2 = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(light2);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
   gerarCalha();
 }
@@ -38,38 +35,35 @@ function init() {
 function gerarCalha() {
   if (mesh) scene.remove(mesh);
 
-  const alturaEsq = Number(document.getElementById("alturaEsq").value);
+  const h1 = Number(document.getElementById("alturaEsq").value);
   const fundo = Number(document.getElementById("fundo").value);
-  const alturaDir = Number(document.getElementById("alturaDir").value);
-  const comprimento = Number(document.getElementById("comprimento").value);
+  const h2 = Number(document.getElementById("alturaDir").value);
+  const comp = Number(document.getElementById("comprimento").value);
 
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
-  shape.lineTo(0, alturaEsq);
-  shape.lineTo(fundo, alturaDir);
+  shape.lineTo(0, h1);
+  shape.lineTo(fundo, h2);
   shape.lineTo(fundo, 0);
   shape.lineTo(0, 0);
 
-  const extrudeSettings = {
-    depth: comprimento / 10,
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: comp / 20,
     bevelEnabled: false
-  };
+  });
 
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-  const cor = document.getElementById("cor").value === "branca"
-    ? 0xffffff
-    : 0xaaaaaa;
+  const corEscolhida =
+    document.getElementById("cor").value === "branca"
+      ? 0xffffff
+      : 0xaaaaaa;
 
   const material = new THREE.MeshStandardMaterial({
-    color: cor,
-    metalness: 0.6,
-    roughness: 0.4
+    color: corEscolhida
   });
 
   mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(-fundo / 2, 0, -comprimento / 20);
+  mesh.position.x = -fundo / 2;
 
   scene.add(mesh);
 }
