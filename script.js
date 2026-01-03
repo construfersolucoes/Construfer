@@ -1,67 +1,88 @@
-let scene, camera, renderer, mesh;
+let scene, camera, renderer, mesh, controls;
 
 init();
-gerarCalha();
+animate();
 
 function init() {
   scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf0f0f0);
+
+  const viewer = document.getElementById("viewer");
 
   camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
+    45,
+    viewer.clientWidth / viewer.clientHeight,
     1,
     10000
   );
+
   camera.position.set(400, 300, 400);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth - 260, window.innerHeight - 70);
-  document.getElementById("viewer").appendChild(renderer.domElement);
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  viewer.appendChild(renderer.domElement);
 
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(500, 500, 500);
-  scene.add(light);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
 
-  const ambient = new THREE.AmbientLight(0xcccccc);
-  scene.add(ambient);
+  const light1 = new THREE.DirectionalLight(0xffffff, 1);
+  light1.position.set(500, 500, 500);
+  scene.add(light1);
 
-  animate();
+  const light2 = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(light2);
+
+  gerarCalha();
 }
 
 function gerarCalha() {
   if (mesh) scene.remove(mesh);
 
-  const h1 = Number(document.getElementById("h1").value);
-  const base = Number(document.getElementById("base").value);
-  const h2 = Number(document.getElementById("h2").value);
-  const length = Number(document.getElementById("length").value);
+  const alturaEsq = Number(document.getElementById("alturaEsq").value);
+  const fundo = Number(document.getElementById("fundo").value);
+  const alturaDir = Number(document.getElementById("alturaDir").value);
+  const comprimento = Number(document.getElementById("comprimento").value);
 
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
-  shape.lineTo(0, h1);
-  shape.lineTo(base, h1);
-  shape.lineTo(base, h2);
-  shape.lineTo(base + 20, h2);
-  shape.lineTo(base + 20, 0);
+  shape.lineTo(0, alturaEsq);
+  shape.lineTo(fundo, alturaDir);
+  shape.lineTo(fundo, 0);
   shape.lineTo(0, 0);
 
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: length,
+  const extrudeSettings = {
+    depth: comprimento / 10,
     bevelEnabled: false
-  });
+  };
 
-  const colorType = document.getElementById("color").value;
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  const cor = document.getElementById("cor").value === "branca"
+    ? 0xffffff
+    : 0xaaaaaa;
+
   const material = new THREE.MeshStandardMaterial({
-    color: colorType === "branca" ? 0xffffff : 0xaaaaaa,
-    metalness: colorType === "branca" ? 0.1 : 0.8,
+    color: cor,
+    metalness: 0.6,
     roughness: 0.4
   });
 
   mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.set(-fundo / 2, 0, -comprimento / 20);
+
   scene.add(mesh);
 }
 
 function animate() {
   requestAnimationFrame(animate);
+  controls.update();
   renderer.render(scene, camera);
 }
+
+window.addEventListener("resize", () => {
+  const viewer = document.getElementById("viewer");
+  camera.aspect = viewer.clientWidth / viewer.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+});
